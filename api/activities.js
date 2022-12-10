@@ -4,7 +4,7 @@ const { getAllActivities, createActivity, updateActivity,
         getActivityById } = require ('../db/activities')
 
 // GET /api/activities/:activityId/routines
-router.get('/api/activities/:activityId/routines', async (req,res,next) => {
+router.get('/:activityId/routines', async (req,res,next) => {
     
     const { activityId } = req.params;
     try{
@@ -21,7 +21,7 @@ router.get('/api/activities/:activityId/routines', async (req,res,next) => {
 
 
 // GET /api/activities
-router.get('/api/activities', async (req,res,next) => {
+router.get('/', async (req,res,next) => {
     console.log ("req.body", req.body)
     try{
         const allActivities = await getAllActivities();
@@ -36,7 +36,7 @@ router.get('/api/activities', async (req,res,next) => {
 });
 
 // POST /api/activities
-router.post('/api/activities', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
 
     const { name, description } = req.body;
     
@@ -55,7 +55,7 @@ try{
 
 // PATCH /api/activities/:activityId
 
-router.patch('/api/:activities/:activityId', async (req, res, next) => {
+router.patch('/:activityId', async (req, res, next) => {
     const { activityId } = req.params;
 
     const { name, description } = req.body;
