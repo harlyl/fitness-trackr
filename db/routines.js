@@ -1,5 +1,6 @@
 const client = require('./client');
 
+
 async function getRoutineById(id){
   try {
     const { rows: [routine] } = await client.query(`
@@ -7,7 +8,7 @@ async function getRoutineById(id){
     WHERE id = '${id}';
     `);
 
-    console.log ("****getRoutineById", routine)
+    
   
     return routine
   
@@ -24,13 +25,12 @@ async function getRoutinesWithoutActivities(){
     FROM routines;
     `);
     
-    console.log ("RRRRRRgetRoutinesWithoutActivities", rows)
+    
     return rows;
    } catch (error){
     console.log ("Error in getRoutinesWithoutActivities function")
     throw error
    }
-
 }
 
 async function getAllRoutines() {
@@ -45,7 +45,6 @@ async function getAllRoutines() {
     console.log ("Error in getAllRoutines")
     throw error;
   }
-
 }
 
 async function getAllRoutinesByUser({username}) {
@@ -61,14 +60,12 @@ async function getAllRoutinesByUser({username}) {
     SELECT * FROM routines
     WHERE "creatorId" = '${rows.id}';
     `);
-   console.log ("ALLRoutinesbyUsername", routines)
+   
   return routines;
     } catch (error) {
     console.log ("Error in getAllPublicRoutines")
     throw error;
   }
-
-
 }
 
 async function getPublicRoutinesByUser({username}) {
@@ -105,8 +102,6 @@ async function getAllPublicRoutines() {
     console.log ("Error in getAllPublicRoutines")
     throw error;
   }
-
-
 }
 
 async function getPublicRoutinesByActivity({id}) {
@@ -129,32 +124,69 @@ async function getPublicRoutinesByActivity({id}) {
     console.log ("Error in getPublicRoutinesByActivity")
     throw error;
   }
-
 }
 
-async function createRoutine({creatorId, isPublic, name, goal}) {
+async function createRoutine({creatorId, name, goal, isPublic}) {
 
   try {
     const { rows: [routine] } = await client.query(`
-    INSERT INTO routines ("creatorId", "isPublic", name, goal) 
+    INSERT INTO routines ("creatorId", name, goal, "isPublic") 
     VALUES ($1, $2, $3, $4)
     RETURNING *;
-    `, [creatorId, isPublic, name, goal]);
+    `, [creatorId, name, goal, isPublic]);
     
    
     return routine
 }catch (error) {
     console.log ("Error in createRoutine function")
     throw error;
-}
-
-
+  }
 }
 
 async function updateRoutine({id, ...fields}) {
+
+  const setString = Object.keys(fields).map(
+    (key, index) => `"${ key }"=$${ index +1 }`
+).join(', ');
+
+if (setString.length === 0) {
+    return;
+}
+try {
+    const { rows: [routine] } = await client.query(`
+    UPDATE activities
+    SET ${ setString }
+    WHERE id=${ id }
+    RETURNING *;
+    `, Object.values(fields));
+
+    return routine;
+} catch (error) {
+    console.log ("Error in updateRoutine function")
+    throw error;
+  }
 }
 
 async function destroyRoutine(id) {
+
+  try{
+  const { rows } = await client.query(`
+  DELETE FROM routines
+  WHERE id = ${id}
+  RETURNING *;
+`)
+
+  const { rows: activities } = await client.query(`
+  DELETE FROM routines_activities
+  WHERE "routineId" = ${id};
+  `)
+  
+  return rows
+
+  } catch (error) {
+    console.log ("Error in deleteRoutine function")
+    throw error;
+  }
 }
 
 module.exports = {

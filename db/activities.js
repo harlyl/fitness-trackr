@@ -8,7 +8,7 @@ async function getAllActivities() {
       SELECT * FROM activities;
       
       `);
-      console.log ("*******************************getAllActivities", rows)
+     
     return rows;
       } catch (error) {
       console.log ("Error in getAllActivities")
@@ -24,7 +24,7 @@ async function getActivityById(id) {
     SELECT * FROM activities
     WHERE id = ${id};
     `);
-    console.log ("****getActivityById", activity)
+   
   return activity;
     } catch (error) {
     console.log ("Error in getActivityById")
@@ -39,7 +39,7 @@ console.log ("name", name)
     SELECT * FROM activities
     WHERE name = '${name}';
     `);
-    console.log ("****getActivityByName", activity)
+    
   return activity;
     } catch (error) {
     console.log ("Error in getActivityByName")
@@ -51,20 +51,25 @@ console.log ("name", name)
 
 // select and return an array of all activities
 async function attachActivitiesToRoutines(routines) {
+  
 }
 
 // return the new activity
-async function createActivity({ name, description }) {
+
+
+async function createActivity({name, description }) {
+//console.log ("input to creatActivityyyyyyyyyy", name, description)
 
   try {
-    const { rows: [activity] } = await client.query(`
+    const { rows } = await client.query(`
     INSERT INTO activities (name, description) 
     VALUES ($1, $2)
+    ON CONFLICT (name) DO NOTHING
     RETURNING *;
     `, [name, description]);
     
-   
-    return activity
+  // console.log ("createdActivity,,,,,,,,,,,,,", rows)
+    return rows
 }catch (error) {
     console.log ("Error in createActivity function")
     throw error;

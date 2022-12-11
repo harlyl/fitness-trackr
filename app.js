@@ -19,9 +19,8 @@ app.use(express.json());
 
 
 app.use((req, res, next) => {
-    console.log("<____Body Logger START___>");
+    console.log("<____REQ.BODY___>");
     console.log(req.body);
-    console.log("<____Body Logger END___>");
     next();
 })
 

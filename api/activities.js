@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const  {JWT_SECRET}= process.env;
+const {requireUser} = require('./utils');
 const { getAllActivities, createActivity, updateActivity, 
         getActivityById } = require ('../db/activities')
 
@@ -10,7 +13,6 @@ router.get('/:activityId/routines', async (req,res,next) => {
     try{
         const activity = await getActivityById(activityId);
        
-      console.log("getActivityById", activity)  
     if (activity) {
         res.send({ activity }); 
     }
@@ -22,14 +24,12 @@ router.get('/:activityId/routines', async (req,res,next) => {
 
 // GET /api/activities
 router.get('/', async (req,res,next) => {
-    console.log ("req.body", req.body)
+    
     try{
         const allActivities = await getAllActivities();
        
-      console.log("getAllActivities", allActivities)  
-    if (allActivities) {
-        res.send({ allActivities }); 
-    }
+        res.send([allActivities]); 
+    
     }catch ({ name, message})  {
         next({ name, message });
     }   
@@ -37,19 +37,37 @@ router.get('/', async (req,res,next) => {
 
 // POST /api/activities
 router.post('/', async (req, res, next) => {
+ const { name, description } = req.body;
 
-    const { name, description } = req.body;
-    
+ const prefix = 'Bearer ';
+ const auth = req.header('Authorization');
+
+ if (!auth) { 
+   next();
+ } else if (auth.startsWith(prefix)) {
+   const token = auth.slice(prefix.length)
+ 
+
+  
 try{
 
+const {id} = jwt.verify(token, JWT_SECRET);
+if (id) {
     const activity = await createActivity(name, description);
- if (activity) {
-    console.log ("POST new activity", activity)
-    res.send({ activity });
- }
+
+   
+    res.send(activity);
+}
+
  }catch ({name, message}) 
  {next({name, message});}
-
+ }
+ else {
+  next({
+    name: 'AuthorizationHeaderError',
+    message: `Authorization token must start with ${ prefix }`
+  });
+}
 });
 
 
@@ -59,7 +77,7 @@ router.patch('/:activityId', async (req, res, next) => {
     const { activityId } = req.params;
 
     const { name, description } = req.body;
-  console.log ("PATCHHHHH00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", activityId, name, description)
+
     const updateFields = {};
   
 

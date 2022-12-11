@@ -29,8 +29,7 @@ async function getUser({ username, password }) {
     SELECT * FROM users
     WHERE username = '${username}' AND password = '${password}';
     `);
-    console.log ("****getUser", user)
-  
+    
     delete user.password;
 
     return user
@@ -45,14 +44,14 @@ async function getUser({ username, password }) {
 
 
 async function getUserById(userId) {
-console.log ("userId", userId)
+
   try {
     const { user } = await client.query(`
     SELECT * FROM users
     WHERE id = '${userId}';
     `);
 
-    console.log ("****getUserById", user)
+    
   
     
     delete user.password;
@@ -66,19 +65,14 @@ console.log ("userId", userId)
 
 }
 
-async function getUserByUsername(userName) {
+async function getUserByUsername(username) {
 
   try {
-    const { user } = await client.query(`
+    const { rows } = await client.query(`
     SELECT * FROM users
     WHERE username = '${username}';
     `);
-
-    console.log ("****getUserByUsername", user)
-  
-    
-    delete user.password;
-
+    const [user] = rows
     return user
   
   } catch (error) {
