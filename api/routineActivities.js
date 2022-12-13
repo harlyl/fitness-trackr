@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 const express = require("express");
 const router = express.Router();
 const {
@@ -9,7 +8,6 @@ const {
 } = require("../db");
 const { requireUser } = require("./utils");
 
-// PATCH /api/routine_activities/:routineActivityId
 router.patch("/:routineActivityId", requireUser, async (req, res, next) => {
   try {
     const { count, duration } = req.body;
