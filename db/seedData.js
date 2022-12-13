@@ -7,7 +7,7 @@ async function dropTables() {
   // drop all tables, in the correct order
   try {
     await client.query(`
-    DROP TABLE IF EXISTS users, activities, routines, routine_activities;
+    DROP TABLE IF EXISTS users;
     `)
   } catch (error) {
     console.error(error);
@@ -20,7 +20,11 @@ async function createTables() {
   // create all tables, in the correct order
   try {
     await client.query(`
-    CREATE TABLE users, activities, routines, routine_activities;
+    CREATE TABLE users(
+      id SERIAL PRIMARY KEY,
+      username varchar(255) UNIQUE NOT NULL,
+      password varchar(255) NOT NULL
+    );
     `)
   } catch (error) {
     console.error(error);

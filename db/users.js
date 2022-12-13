@@ -12,9 +12,7 @@ async function testDB() {
     console.log(rows);
   } catch (error) {
     console.error(error);
-  } finally {
-    client.end()
-  }
+  } 
 }
 
 testDB();
@@ -37,16 +35,43 @@ async function createUser({ username, password }) {
 }
 
 async function getUser({ username, password }) {
+  try {
+    await client.query(`
+    SELECT username
+    FROM users
+    WHERE username =$1
+    AND password =$2;
+  `, [username, password]);
 
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
+
+
+
+console.log(getUser('albert', 'bertie99'));
+
 
 async function getUserById(userId) {
-
+  try {
+    await client.query(`
+    SELECT username
+    FROM users
+    WHERE id=$1;
+    `, [userId]);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-async function getUserByUsername(userName) {
 
-}
+
+async function getUserByUsername(username) {
+  
+};
 
 module.exports = {
   createUser,
