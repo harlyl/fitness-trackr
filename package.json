@@ -10,6 +10,8 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --runInBand --watchAll",
+    "test:watch:db": "jest --watchAll db",
+    "test:watch:api": "jest --watchAll api",
     "users:dev": "nodemon ./db/users.js"
   },
   "repository": {
