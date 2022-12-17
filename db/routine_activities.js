@@ -50,45 +50,12 @@ async function getRoutineActivitiesByRoutine(routine) {
      WHERE "routineId" = ${routine.id};
     `)
 console.log ("getRoutineActivitiesByRoutine ############################@@@@@@@@@ROWS", routines)
-//     const {rows: routine} = await client.query(`
-//     SELECT * 
-//     FROM routines
-//     WHERE id = ${id};
-//    `)
-// console.log ("getRoutineActivitiesByRoutine ############################@@@@@@@@@ROutine", routine)
-//     if (rows.activity.id){
-//     const {rows: activity } = await client.query(`
-//     SELECT * 
-//     FROM activities
-//     WHERE id = ${rows.activityId};
-//    `)
-//     }
-// console.log ("getRoutineActivitiesByRoutine ############################@@@@@@@@@Activity", activity)
-   
-//    if (rows.duration){
-//     activity.duration = rows.duration;
-//    }
-//    if (rows.count){
-//    activity.count = rows.count;
-//    }
-//    if (rows.activityId){
-//    activity.routineActivityId = rows.activityId;
-//    }
-//    if (rows.routineId){
-//    activity.routineId = rows.routineId;
-//    }
-//    if (activity) {
-//    routine.activity = activity;
-//    }
-//   // console.log ("getRoutineActivitiesByRoutine ############################@@@@@@@@@FINALROUTINE", routine)
+
    return routines
   } catch (error) {
     console.log ("Error in getRoutineActivitiesByRoutine function")
     throw error;
   }
-
-
-
 }
 
 async function updateRoutineActivity ({id, ...fields}) {
@@ -144,29 +111,32 @@ return deletedRoutineActivity[0]
 
 async function canEditRoutineActivity(routineActivityId, userId) {
    
-  console.log(routineActivityId, userId) 
+  //console.log("canEditRoutineActivity", routineActivityId, userId) 
+
+try{
+  const {rows :users} = await client.query(`
+  SELECT * FROM users
+  INNER JOIN routines
+  ON ${userId} = routines."creatorId"
+  INNER JOIN routine_activities
+  ON routines.id = routine_activities."routineId"
+`)
+ // console.log("JJJJJJJJJJ", users[0])
+if (users[0]){
+  return true
+}else {
+  return false
+}
+}catch (error) {
+  console.log ("Error in deleteRoutine function")
+  throw error;
+}
+}
+  
+  
+  
   
 
-  const { rows: updatedroutine_activity } = await client.query(`
-  UPDATE routine_activities
-  SET id=${routineActivityId}
-  WHERE id= ${userId};
-  `);
-  
-  
-  
-  // ADD "userId" = ${userId}
-  // WHERE id= ${routineActivityId}
-  // RETURNING *;
-  // `);
-  console.log (">>>>>>>>>>>>",updatedroutine_activity)
-  if (!updatedroutine_activity){
-    return false
-  }else {
-    return true
-  }
-  
-}
 
 module.exports = {
   getRoutineActivityById,

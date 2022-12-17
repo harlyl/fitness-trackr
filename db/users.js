@@ -30,10 +30,14 @@ async function getUser({ username, password }) {
     WHERE username = '${username}' AND password = '${password}';
     `);
     
+    if (!user.password){
+      return null
+    } 
+    
+   else {
+      console.log ("LLLLLLL",user.password)
     delete user.password;
-
-    return user
-  
+    return user}
   
     } catch (error) {
     console.log ("Error in getUser")

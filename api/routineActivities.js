@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { updateRoutineActivity, destroyRoutineActivity } = require ('../db/routine_activities')
+const { updateRoutineActivity, destroyRoutineActivity, getRoutineActivityById } = require ('../db/routine_activities')
+const {getActivityById} = require ('../db/activities')
 const {requireUser} = require('./utils');
 const jwt = require('jsonwebtoken');
 const  {JWT_SECRET}= process.env;
@@ -9,13 +10,14 @@ const  {JWT_SECRET}= process.env;
 // PATCH /api/routine_activities/:routineActivityId
 
 router.patch('/:routineActivityId', async (req, res, next) => {
-    const { activityId } = req.params;
 
+
+    const { routineActivityId } = req.params;
+    //console.log ("patch Req Params>>>>>>>>>>>>>>>>", req.params)
     const { count, duration } = req.body;
 
     const updateFields = {};
-  
-
+    
     if (count) {
       updateFields.count = count;
     }
@@ -23,12 +25,22 @@ router.patch('/:routineActivityId', async (req, res, next) => {
     if (duration) {
       updateFields.duration = duration;
     }
-  
+    const prefix = 'Bearer ';
+    const auth = req.header('Authorization');
+   
+    if (!auth) { 
+      next();
+    } else if (auth.startsWith(prefix)) {
+      const token = auth.slice(prefix.length)
+    }
+
+
     try {
-     
-      const updatedRoutineActivity = await updateRoutineActivity(activityId, updateFields);
-        res.send({ updatedroutineactivity: updatedRoutineActivity })
-      
+      const {id} = jwt.verify(token, JWT_SECRET);
+      if (id && token) {
+      const updatedRoutineActivity = await updateRoutineActivity(routineActivityId, updateFields);
+        res.send( updatedRoutineActivity )
+      }
       } catch ({ name, message }) {
       next({ name, message });
     }
@@ -36,8 +48,8 @@ router.patch('/:routineActivityId', async (req, res, next) => {
 
 
 // DELETE /api/routine_activities/:routineActivityId
-router.delete('/:routineActivityId', requireUser, async (req, res, next) => {
-
+router.delete('/:routineActivityId', async (req, res, next) => {
+//console.log ("REQ PARAMS>>>>>>>>>", req.params.routineActivityId)
     const prefix = 'Bearer ';
     const auth = req.header('Authorization');
    
@@ -49,13 +61,13 @@ router.delete('/:routineActivityId', requireUser, async (req, res, next) => {
    try {
    
        const {id} = jwt.verify(token, JWT_SECRET);
-   if (id) {
-       const activity = await getActivityById(req.params.activityId);
+   if (id && token) {
+       const routineActivity = await getRoutineActivityById(req.params.routineActivityId);
    
-       
-         const deletedActivity = await destroyRoutineActivity(activity.id);
-   
-         res.send({ post: deletedActivity });
+       //console.log ("routineactivity>>>>>>>>>", routineActivity)
+         const deletedActivity = await destroyRoutineActivity(routineActivity.id);
+        // console.log ("deleted Activity>>>>>>>>>", deletedActivity)
+         res.send(deletedActivity);
    } 
    
      } catch ([name, message]){

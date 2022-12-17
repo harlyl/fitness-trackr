@@ -129,7 +129,10 @@ async function getAllRoutinesByUser(user) {
     ON routines."creatorId" = ${rows[0].id};
     `);
    
-    const routines2 = routines.map((routine)=>{
+  //   const posts = await Promise.all(postIds.map(
+  //     post => getPostById( post.id )
+  // ));
+    const routines2 = await Promise.all(routines.map((routine)=>{
       
       routine.activities = { 
       "id" : routine.activityId,
@@ -151,7 +154,7 @@ async function getAllRoutinesByUser(user) {
       delete routine.routineId
       delete routine.username
       return routine
-    })
+    }))
 
     const activityArr = routines2.map((routine)=>{
       return (routine.activities)
@@ -197,7 +200,7 @@ async function getPublicRoutinesByUser({username}) {
     `);
    
     
-    const routines2 = routines.map((routine)=>{
+    const routines2 = await Promise.all(routines.map((routine)=>{
       
       routine.activities = { 
       "id" : routine.activityId,
@@ -219,7 +222,7 @@ async function getPublicRoutinesByUser({username}) {
       delete routine.routineId
       delete routine.username
       return routine
-    })
+    }))
 
     const activityArr = routines2.map((routine)=>{
       return (routine.activities)
@@ -262,8 +265,10 @@ async function getAllPublicRoutines() {
     WHERE "isPublic" = true;
     `);
  //console.log ("getAllPublicRoutines>>>>>>>>>>>", routines)
-
- const routines2 = routines.map((routine)=>{
+//  const posts = await Promise.all(postIds.map(
+//   post => getPostById( post.id )
+// ));
+ const routines2 = await Promise.all(routines.map((routine)=>{
       
   routine.activities = { 
   "id" : routine.activityId,
@@ -285,7 +290,7 @@ async function getAllPublicRoutines() {
   delete routine.routineId
   delete routine.username
   return routine
-})
+}))
 
 const activityArr = routines2.map((routine)=>{
   return (routine.activities)
@@ -327,8 +332,11 @@ async function getPublicRoutinesByActivity({id}) {
     WHERE routines."isPublic" = true;
     `);
    
+  //   const posts = await Promise.all(postIds.map(
+  //     post => getPostById( post.id )
+  // ));
     
-    const routines2 = routines.map((routine)=>{
+    const routines2 = await Promise.all(routines.map((routine)=>{
       
       routine.activities = { 
       "id" : routine.activityId,
@@ -350,7 +358,7 @@ async function getPublicRoutinesByActivity({id}) {
       delete routine.routineId
       delete routine.username
       return routine
-    })
+    }))
 
     const activityArr = routines2.map((routine)=>{
       return (routine.activities)
