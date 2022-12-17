@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const  {JWT_SECRET}= process.env;
@@ -153,4 +153,8 @@ router.patch('/:activityId', async (req, res, next) => {
 
 
 module.exports = router;
+<<<<<<< HEAD
 
+=======
+console.log();
+>>>>>>> routines
