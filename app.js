@@ -30,14 +30,14 @@ app.use('/api', apiRouter);
 
 apiRouter.use((error, req, res, next) => {
     console.error(error);
-    res.status(404);
+  //  res.status(404);
     res.send("That page was not found.");
     next()
   });
 
 apiRouter.use((error, req, res, next) => {
     console.error(error);
-    res.status(500);
+   // res.status(500);
     res.send({
       name: error.name,
       message: error.message

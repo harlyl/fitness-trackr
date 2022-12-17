@@ -14,7 +14,7 @@ async function createUser({ username, password }) {
     `, [username, password]);
     
     delete user.password
-    return user.username
+    return user
 }catch (error) {
     console.log ("Error in createUser function")
     throw error;
@@ -46,17 +46,15 @@ async function getUser({ username, password }) {
 async function getUserById(userId) {
 
   try {
-    const { user } = await client.query(`
+    const {rows}  = await client.query(`
     SELECT * FROM users
     WHERE id = '${userId}';
     `);
 
-    
-  
-    
-    delete user.password;
+    delete rows[0].password;
+    //console.log( "GETUSERBYID#############", rows[0])
 
-    return user
+    return rows[0]
   
   } catch (error) {
     console.log ("Error in getUserById")
@@ -68,12 +66,15 @@ async function getUserById(userId) {
 async function getUserByUsername(username) {
 
   try {
-    const { rows } = await client.query(`
+    const { rows: user } = await client.query(`
     SELECT * FROM users
     WHERE username = '${username}';
     `);
-    const [user] = rows
-    return user
+    
+   
+    
+    //console.log ("###################USER BY USERNAME", user)
+    return user[0]
   
   } catch (error) {
     console.log ("Error in getUserByUsername")

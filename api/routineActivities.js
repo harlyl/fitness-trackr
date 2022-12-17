@@ -58,8 +58,9 @@ router.delete('/:routineActivityId', requireUser, async (req, res, next) => {
          res.send({ post: deletedActivity });
    } 
    
-     } catch ({ name, message }) 
-       next({ name, message })
+     } catch ([name, message]){
+       next()
+     }
      }
      else {
       next({

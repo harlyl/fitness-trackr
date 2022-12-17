@@ -6,9 +6,8 @@ async function getAllActivities() {
   try {
       const { rows } = await client.query(`
       SELECT * FROM activities;
-      
       `);
-     
+   // console.log ("???????////////////////ROWS GETALLACTIVITIES", rows)
     return rows;
       } catch (error) {
       console.log ("Error in getAllActivities")
@@ -19,13 +18,15 @@ async function getAllActivities() {
 
 async function getActivityById(id) {
 
+  //console.log ("###########################getActivityById activity", id)
   try {
-    const { rows: [activity] } = await client.query(`
+    const {rows: activity} = await client.query(`
     SELECT * FROM activities
     WHERE id = ${id};
     `);
    
-  return activity;
+    //console.log ("###########################getActivityById activityROWS", activity[0])
+  return activity[0];
     } catch (error) {
     console.log ("Error in getActivityById")
     throw error;
@@ -33,14 +34,14 @@ async function getActivityById(id) {
 }
 
 async function getActivityByName(name) {
-console.log ("name", name)
+//console.log ("getActivityByName name>>>>>>>>>", name)
   try {
-    const {rows: [activity]} = await client.query(`
+    const {rows: activity} = await client.query(`
     SELECT * FROM activities
     WHERE name = '${name}';
     `);
-    
-  return activity;
+   // console.log ("MMMMMMMMMMM>>>>", activity[0])
+  return activity[0];
     } catch (error) {
     console.log ("Error in getActivityByName")
     throw error;
@@ -57,8 +58,8 @@ async function attachActivitiesToRoutines(routines) {
 // return the new activity
 
 
-async function createActivity({name, description }) {
-//console.log ("input to creatActivityyyyyyyyyy", name, description)
+async function createActivity({name, description}) {
+//console.log ("input to %%%%%%%%%%%%%%%%%%creatActivityyyyyyyyyy", name, description)
 
   try {
     const { rows } = await client.query(`
@@ -67,11 +68,14 @@ async function createActivity({name, description }) {
     ON CONFLICT (name) DO NOTHING
     RETURNING *;
     `, [name, description]);
-    
-  // console.log ("createdActivity,,,,,,,,,,,,,", rows)
-    return rows
+
+   
+ // console.log ("createdActivity%%%%%%%%%%%%%%%%%%,,,,,,,,,,,,,", rows[0]);
+
+   return rows[0];
+
 }catch (error) {
-    console.log ("Error in createActivity function")
+    console.log ("^^^^^^^^^^^^^Error in createActivity function")
     throw error;
 }
 
@@ -82,29 +86,49 @@ async function createActivity({name, description }) {
 // do update the name and description
 // return the updated activity
 
-async function updateActivity({ id, ...fields }) {
+async function updateActivity(fields) {
 
-  const setString = Object.keys(fields).map(
-    (key, index) => `"${ key }"=$${ index +1 }`
-).join(', ');
+  const {id, name, description} = fields
+ // console.log("###############################fields", id, name, description)
 
-if (setString.length === 0) {
-    return;
-}
+ // const setString = Object.keys(fields).map(
+ //   (key, index) => `"${ key }"=$${ index +1 }`
+//).join(', ');
+
+//if (setString.length === 0) {
+ //   return;
+//}
+//console.log("###############################setString, id", name, description, id)
+
 try {
-    const { rows: [activity] } = await client.query(`
+  if (name){
+    const {rows: nameChange}  = await client.query(`
     UPDATE activities
-    SET ${ setString }
-    WHERE id=${ id }
+    SET name=$1
+    WHERE id= ${id}
     RETURNING *;
-    `, Object.values(fields));
+    `, [name]);
 
-    return activity;
-} catch (error) {
-    console.log ("Error in updateActivity function")
-    throw error;
+  //  console.log("###############################ACTIvityROWS name", namechange[0])
+    return nameChange[0];
+
+}   if (description){
+  const {rows: descriptionChange}  = await client.query(`
+  UPDATE activities
+  SET description=$1
+  WHERE id= ${id}
+  RETURNING *;
+  `, [description]);
+
+  //console.log("###############################ACTIvityROWS description", descriptionchange[0])
+  return descriptionChange[0];
+
 }
 
+} catch (error) {
+   // console.log ("Error in updateActivity function")
+   // throw error;
+}
 }
 
 

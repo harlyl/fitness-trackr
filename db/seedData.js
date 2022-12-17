@@ -50,7 +50,7 @@ async function createTables() {
       "creatorId" INTEGER REFERENCES users(id),
       name varchar(255) UNIQUE NOT NULL,
       goal TEXT NOT NULL,
-      "isPublic" BOOLEAN DEFAULT false
+      "isPublic" BOOLEAN DEFAULT true
     );
       CREATE TABLE routine_activities (
       id SERIAL PRIMARY KEY,

@@ -10,8 +10,8 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --runInBand --watchAll",
-    "test:watch:api": "jest --watchAll api",
-    "test:watch:db": "jest --watchAll db"
+    "test:watch:api": "jest --runInBand --watchAll api",
+    "test:watch:db": "jest --runInBand --watchAll db"
   },
   "repository": {
     "type": "git",

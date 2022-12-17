@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { destroyRoutine, getAllRoutines } = require('../db/routines')
+const { destroyRoutine, getAllRoutines, 
+    getRoutineById, updateRoutine, createRoutine } = require('../db/routines')
 const {addActivityToRoutine} = require('../db/routine_activities')
 const {requireUser} = require('./utils');
 const jwt = require('jsonwebtoken');
@@ -13,8 +14,8 @@ router.get('/', async (req,res,next) => {
     
     try{
         const allRoutines = await getAllRoutines();
-       
-        res.send([allRoutines]); 
+       console.log ("^^^^^^^^^^^^^^^^^^^XXXXXXX%%%%%%%%XXXXXXXXXXX",allRoutines)
+        res.send(allRoutines); 
     
     }catch ({ name, message})  {
         next({ name, message });
@@ -82,7 +83,7 @@ router.patch('/:routineId', async (req, res, next) => {
   
     try {
      
-      const updatedRoutine = await updateRoutine(activityId, updateFields);
+      const updatedRoutine = await updateRoutine(routineId, updateFields);
         res.send({ activity: updatedRoutine })
       
       } catch ({ name, message }) {
@@ -106,15 +107,15 @@ try {
     const {id} = jwt.verify(token, JWT_SECRET);
 if (id) {
     const routine = await getRoutineById(req.params.routineId);
-
-    
-      const deletedRoutine = await destroyRoutine(routine.id);
+    const deletedRoutine = await destroyRoutine(routine.id);
 
       res.send({ post: deletedRoutine });
+      next();
 } 
 
-  } catch ({ name, message }) 
-    next({ name, message })
+  } catch ({ name, message }){
+    next()
+  }
   }
   else {
    next({
