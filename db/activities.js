@@ -1,7 +1,7 @@
 const client = require("./client")
 
 // database functions
-
+//<<<<<<< HEAD
 
 async function getAllActivities() {   
   try {
@@ -11,11 +11,11 @@ async function getAllActivities() {
    // console.log ("???????////////////////ROWS GETALLACTIVITIES", rows)
     return rows;
       } catch (error) {
-      console.log ("Error in getAllActivities")
+      console.log ("Error in getAllActivities");
+      console.error(error)
       throw error;
     }
   }
-
 
 
 async function getActivityById(id) {
