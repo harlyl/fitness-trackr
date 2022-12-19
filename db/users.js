@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 // user functions
 async function createUser({ username, password }) {
 
+
   const SALT_COUNT = 10;
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
@@ -76,7 +77,7 @@ async function getUserByUsername(username) {
     console.error(error);
     throw error;
   }
-}
+
 
 module.exports = {
   createUser,
