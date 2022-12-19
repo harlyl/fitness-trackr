@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 
 const { 
     createUser,
-    getAllUsers,
     getUserByUsername,
   } = require('../db');
 
@@ -49,8 +48,9 @@ router.post('/login', async (req, res, next) => {
 
 // POST /api/users/register
 router.post('/register', async (req, res, next) => {
-    const { username, password, name, location } = req.body;
-  
+    console.log(req.body)
+    const { username, password } = req.body;
+    console.log(`username: ${username}`)
     try {
       const _user = await getUserByUsername(username);
     
@@ -64,8 +64,6 @@ router.post('/register', async (req, res, next) => {
       const user = await createUser({
         username,
         password,
-        name,
-        location,
       });
   
       const token = jwt.sign({ 
