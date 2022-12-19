@@ -6,6 +6,7 @@ const SALT_COUNT = 10;
 // user functions
 async function createUser({ username, password }) {
 
+
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
     const {rows: [ user ]} = await client.query(`
@@ -89,7 +90,7 @@ async function getUserByUsername(username) {
     console.error(error);
     throw error;
   }
-}
+
 
 module.exports = {
   createUser,

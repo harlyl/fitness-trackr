@@ -14,10 +14,19 @@ const { JWT_SECRET = 'neverTell'} = process.env;
 // GET /api/health
 router.get('/health', async (req, res, next) => {
     res.status(200);
-    res.send({
-        message: "Server id healthy."
-    })
+  res.send({
+    message: "system is healthy"
+
 });
+});
+
+router.use((error, req, res, next) => {
+  console.log ("EEEERRRRROOORRR", error);
+   res.status(404);
+  res.send({
+     message: "Page Not Found"
+    });
+  });
 
 router.use(async (req, res, next) => {
     const prefix = "Bearer";
