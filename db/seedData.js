@@ -1,4 +1,5 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
+
 // const { } = require('./');
 const client = require("./client");
 const {createUser} = require("./users");
@@ -22,9 +23,12 @@ async function dropTables() {
 
 }
 
+
+
 async function createTables() {
   console.log("Starting to build tables...")
   // create all tables, in the correct order
+
   try {await client.query(`
   CREATE TABLE users(
     id SERIAL PRIMARY KEY,
