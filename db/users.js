@@ -1,19 +1,23 @@
 const client = require("./client");
+const bcrypt = require('bcrypt');
 
 // database functions
 
 // user functions
 async function createUser({ username, password }) {
 
+  const SALT_COUNT = 10;
+  const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
+
   try {
     const { rows: [user] } = await client.query(`
     INSERT INTO users (username, password) 
     VALUES ($1, $2)
     ON CONFLICT (username) DO NOTHING
-    RETURNING *;
-    `, [username, password]);
+    RETURNING id, username;
+    `, [username, hashedPassword]);
     
-    delete user.password
+
     return user
 }catch (error) {
     console.log ("Error in createUser function")
@@ -24,22 +28,24 @@ async function createUser({ username, password }) {
 
 
 async function getUser({ username, password }) {
+  if (!username || !password){
+    return
+  }
   try {
-    const { rows: [user] } = await client.query(`
-    SELECT * FROM users
-    WHERE username = '${username}' AND password = '${password}';
-    `);
-    
-    if (!user.password){
-      return null
-    } 
-    
-   else {
-      console.log ("LLLLLLL",user.password)
-    delete user.password;
-    return user}
-  
-    } catch (error) {
+    const user = await getUserByUsername(username)
+
+    const hashedPassword = user.password
+    const passwordsMatch = await bcrypt.compare(password, hashedPassword);
+ 
+    if (passwordsMatch) {
+delete user.password;
+return user
+
+    } else {
+      return null;
+    }
+
+   } catch (error) {
     console.log ("Error in getUser")
     throw error;
   }
@@ -49,17 +55,21 @@ async function getUser({ username, password }) {
 
 async function getUserById(userId) {
 
+//  console.log ("userId>>>>>>",userId)
   try {
-    const {rows}  = await client.query(`
+    const {rows: user}  = await client.query(`
     SELECT * FROM users
-    WHERE id = '${userId}';
-    `);
+    WHERE id = $1;
+    `, [userId]);
 
-    delete rows[0].password;
+    if (!user){
+      return null
+    } else{
+    delete user[0].password;
     //console.log( "GETUSERBYID#############", rows[0])
 
-    return rows[0]
-  
+    return user[0]
+    }
   } catch (error) {
     console.log ("Error in getUserById")
     throw error;
@@ -72,8 +82,8 @@ async function getUserByUsername(username) {
   try {
     const { rows: user } = await client.query(`
     SELECT * FROM users
-    WHERE username = '${username}';
-    `);
+    WHERE username = $1;
+    `, [username]);
     
    
     

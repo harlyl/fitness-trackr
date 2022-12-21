@@ -6,7 +6,8 @@ const {getRoutineActivitiesByRoutine} = require ('../db/routine_activities')
 const {getActivityById} = require ('../db/activities')
 const jwt = require('jsonwebtoken');
 const  {JWT_SECRET}= process.env;
-const {requireUser} = require('./utils');
+const bcrypt = require ('bcrypt')
+
 
 
 // POST /api/users/login
@@ -21,11 +22,13 @@ router.post('/login', async (req, res, next) => {
         });
     }
     try{
-        const user = await getUserByUsername(username);
+        const user = await getUserByUsername(username, password);
+        const SALT_COUNT = 10;
+        const hashedpassword = await bcrypt.hash(password, SALT_COUNT);
 
        // console.log ("555555555555 USER Login AFTER getUserByUsername", user, password)
 
-        if (user && user.password == password) {
+        if (user && user.password == hashedpassword) {
             const token = jwt.sign({
                 id: user.id
             }, JWT_SECRET);

@@ -7,12 +7,12 @@ async function getRoutineActivityById(id){
     const {rows: routineActivity } = await client.query(`
     SELECT * 
     FROM routine_activities
-    WHERE id = ${id};
-   `)
+    WHERE id = $1;
+   `, [id])
   // console.log ("KKKKKKKKKKK", routineActivity)
     return routineActivity[0]
   }catch (error) {
-    console.log ("Error in getRoutineActivityById function")
+    console.log ("Error in getRoutineActivityById function" + error)
     throw error;
   }
   
@@ -35,23 +35,22 @@ async function addActivityToRoutine({
  //   console.log ("OUTPut to addActivityToROUTINE", routine_activity)
     return routine_activity[0]
 }catch (error) {
-    console.log ("Error in addActivityToRoutine function")
+    console.log ("Error in addActivityToRoutine function" + error)
     throw error;
   }
-
 }
 
 async function getRoutineActivitiesByRoutine(routine) {
-  console.log ("getRoutineActivitiesByRoutine ##############################@@@@@@@@@ID", routine)
+  console.log (routine.id)
   try {
-    const {rows: routines}  = await client.query(`
+    const {rows: routineActivity}  = await client.query(`
      SELECT * 
      FROM routine_activities
-     WHERE "routineId" = ${routine.id};
-    `)
-console.log ("getRoutineActivitiesByRoutine ############################@@@@@@@@@ROWS", routines)
+     WHERE "routineId" = $1;
+    `, [routine.id])
 
-   return routines
+
+   return routineActivity
   } catch (error) {
     console.log ("Error in getRoutineActivitiesByRoutine function")
     throw error;
@@ -92,10 +91,10 @@ async function destroyRoutineActivity(id) {
   try{
   const { rows: deletedRoutineActivity } = await client.query(`
   DELETE FROM routine_activities
-  WHERE "activityId" = ${id}
+  WHERE "activityId" = $1
   RETURNING *;
 
-  `)
+  `, [id])
 
   console.log ("LLLLLLLLLLLLLL", deletedRoutineActivity)
 return deletedRoutineActivity[0]

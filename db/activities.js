@@ -53,6 +53,35 @@ async function getActivityByName(name) {
 // select and return an array of all activities
 async function attachActivitiesToRoutines(routines) {
   
+  const routineArray = [...routines];
+ // console.log(routineArray)
+  const routineIds = routines.map((routine) => {return routine.id});
+  //console.log (routineIds)
+  if (routines.length === 0){
+    return;
+  }
+  
+  try{
+    const {rows: activities} = await client.query(`
+    SELECT activities.*, routine_activities.duration, routine_activities.count, 
+    routine_activities.id AS "routineActivityId", routine_activities."routineId"
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
+    WHERE routine_activities."routineId" IN (${routineIds.map((routineId, index) => 
+      ('$' + (index +1))).join(',')});
+    `, routineIds);
+
+    for (let routine of routineArray){
+      const addActivities = activities.filter((activity) => routine.id === activity.routineId);
+      routine.activities = addActivities;
+      } 
+
+   // console.log (routineArray)
+    return await routineArray;
+  } catch (error) {
+    console.log("Error attaching activities to routines")
+    throw error;
+  }
 }
 
 // return the new activity

@@ -1,20 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { destroyRoutine, getAllRoutines, 
-    getRoutineById, updateRoutine, createRoutine } = require('../db/routines')
-const {addActivityToRoutine} = require('../db/routine_activities')
+const { 
+  destroyRoutine,  
+  getRoutineById, 
+  updateRoutine, 
+  createRoutine,
+  getAllPublicRoutines } = require('../db/routines')
+const {addActivityToRoutine, getRoutineActivityById} = require('../db/routine_activities')
 const {requireUser} = require('./utils');
-const jwt = require('jsonwebtoken');
-const  {JWT_SECRET}= process.env;
 
 
 // GET /api/routines
 
-router.get('/', async (req,res,next) => {
+router.get('/',  async (req,res,next) => {
     
     try{
-        const allRoutines = await getAllRoutines();
-       console.log ("^^^^^^^^^^^^^^^^^^^XXXXXXX%%%%%%%%XXXXXXXXXXX",allRoutines)
+        const allRoutines = await getAllPublicRoutines();
+       //console.log ("^^^^^^^^^^^^^^^^^^^XXXXXXX%%%%%%%%XXXXXXXXXXX",allRoutines)
         res.send(allRoutines); 
     
     }catch ({ name, message})  {
@@ -24,45 +26,29 @@ router.get('/', async (req,res,next) => {
 
 // POST /api/routines
 
-router.post('/', async (req, res, next) => {
-    const { name, goal, isPublic } = req.body;
+router.post('/', requireUser, async (req, res, next) => {
+    const { name, goal, isPublic = "" } = req.body;
+  
    
-    const prefix = 'Bearer ';
-    const auth = req.header('Authorization');
+    try{
    
-    if (!auth) { 
-      next();
-    } else if (auth.startsWith(prefix)) {
-      const token = auth.slice(prefix.length)
-    
-   
-     
-   try{
-   
-   const {id} = jwt.verify(token, JWT_SECRET);
-   if (id) {
-       const routine = await createRoutine(id, name, goal, isPublic);
+    const routine = await createRoutine(id, name, goal, isPublic);
    
       
        res.send(routine);
-   }
+   
    
     }catch ({name, message}) 
     {next({name, message});}
-    }
-    else {
-     next({
-       name: 'AuthorizationHeaderError',
-       message: `Authorization token must start with ${ prefix }`
-     });
-   }
+    
    });
 
 
 // PATCH /api/routines/:routineId
 
-router.patch('/:routineId', async (req, res, next) => {
-    const { routineId } = req.params;
+router.patch('/:routineId', requireUser, async (req, res, next) => {
+    
+  const { routineId } = req.params;
 
     const { name, goal, isPublic } = req.body;
 
@@ -73,8 +59,8 @@ router.patch('/:routineId', async (req, res, next) => {
       updateFields.name = name;
     }
   
-    if (description) {
-      updateFields.description = description;
+    if (goal) {
+      updateFields.goal = goal;
     }
 
     if (isPublic) {
@@ -84,7 +70,8 @@ router.patch('/:routineId', async (req, res, next) => {
     try {
      
       const updatedRoutine = await updateRoutine(routineId, updateFields);
-        res.send({ activity: updatedRoutine })
+      console.log (">>>>>>>>Updated Routine")
+        res.send({ updatedRoutine })
       
       } catch ({ name, message }) {
       next({ name, message });
@@ -94,36 +81,28 @@ router.patch('/:routineId', async (req, res, next) => {
 // DELETE /api/routines/:routineId
 router.delete('/:routineId', requireUser, async (req, res, next) => {
 
- const prefix = 'Bearer ';
- const auth = req.header('Authorization');
-
- if (!auth) { 
-   next();
- } else if (auth.startsWith(prefix)) {
-   const token = auth.slice(prefix.length)
  
 try {
-
-    const {id} = jwt.verify(token, JWT_SECRET);
-if (id) {
     const routine = await getRoutineById(req.params.routineId);
-    const deletedRoutine = await destroyRoutine(routine.id);
+    if (routine.creatorId != req.user.id) {
+      res.status(403);
+      next({
+        name: "UnauthorizedUserError",
+        message: `User ${req.user.username} is not allowed to delete ${routine.name}`
+      })
+    }else {
+    
+      const deletedRoutine = await destroyRoutine(routine.id);
 
-      res.send({ post: deletedRoutine });
+      res.send({ deletedRoutine });
       next();
 } 
 
   } catch ({ name, message }){
     next()
   }
-  }
-  else {
-   next({
-     name: 'AuthorizationHeaderError',
-     message: `Authorization token must start with ${ prefix }`
-   });
-}
-});
+  
+ });
 
 
 
@@ -132,12 +111,19 @@ if (id) {
 router.post('/:routineId/activities', async (req, res, next) => {
     const { routineId } = req.params;
     const { activityId, count, duration } = req.body;
-    try{
-        const routine = await addActivityToRoutine(routineId, activityId, count, duration);
-   
-      
-        res.send(routine);
+    const routineActId = await getRoutineActivityById(activityId);
 
+    try{
+      if (routineActId) {
+        next({ 
+          name: "ExistingIdError",
+          message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`
+        });
+      } else {
+        const addedActivity = await addActivityToRoutine(routineId, activityId, count, duration);
+   
+      res.send(addedActivity);
+      }
     } catch ({ name, message }) {
         next({ name, message });
       }
