@@ -10,6 +10,7 @@ router.get('/health', async (req, res, next) => {
   res.send({
     message: "system is healthy"
 });
+next()
 });
 
 router.use(async (req, res, next) => {

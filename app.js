@@ -28,12 +28,12 @@ app.use((req, res, next) => {
 const apiRouter = require('./api');
 app.use('/api', apiRouter);
 
-// apiRouter.use((error, req, res, next) => {
-//     console.error(error);
-//    res.status(404);
-//     res.send("That page was not found.");
-//     next()
-//   });
+apiRouter.use((error, req, res, next) => {
+    console.error(error);
+   res.status(404);
+    res.send("That page was not found.");
+    next()
+  });
 
 // apiRouter.use((error, req, res, next) => {
 //     console.error(error);

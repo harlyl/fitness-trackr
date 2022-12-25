@@ -4,8 +4,11 @@ const bcrypt = require('bcrypt');
 // database functions
 
 // user functions
-async function createUser({ username, password }) {
+async function createUser({...fields}) {
 
+ // console.log (fields)
+  const {username, password} = fields
+  //console.log (username, password)
   const SALT_COUNT = 10;
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
 
@@ -17,7 +20,7 @@ async function createUser({ username, password }) {
     RETURNING id, username;
     `, [username, hashedPassword]);
     
-
+//console.log (user)
     return user
 }catch (error) {
     console.log ("Error in createUser function")
@@ -28,12 +31,13 @@ async function createUser({ username, password }) {
 
 
 async function getUser({ username, password }) {
+ // console.log (username, password)
   if (!username || !password){
     return
   }
   try {
     const user = await getUserByUsername(username)
-
+//console.log(user)
     const hashedPassword = user.password
     const passwordsMatch = await bcrypt.compare(password, hashedPassword);
  
@@ -78,16 +82,16 @@ async function getUserById(userId) {
 }
 
 async function getUserByUsername(username) {
-
+//console.log (username)
   try {
     const { rows: user } = await client.query(`
     SELECT * FROM users
-    WHERE username = $1;
+    WHERE users.username = $1;
     `, [username]);
     
    
     
-    //console.log ("###################USER BY USERNAME", user)
+   // console.log (user[0])
     return user[0]
   
   } catch (error) {

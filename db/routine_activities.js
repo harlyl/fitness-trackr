@@ -57,23 +57,26 @@ async function getRoutineActivitiesByRoutine(routine) {
   }
 }
 
-async function updateRoutineActivity ({id, ...fields}) {
-
-    const { count, duration } = fields
-
-    const setString = Object.keys(fields).map(
+async function updateRoutineActivity ({...fields}) {
+console.log(fields)
+    const {count, duration, id}= fields
+   // delete fields.routineActivityId
+    delete fields.id
+console.log(count, duration, id)
+    
+const setString = Object.keys(fields).map(
       (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
-    
+    console.log (setString)
    try {
         const {rows: updatedRoutineActivity} = await client.query(`
         UPDATE routine_activities
         SET ${setString}
-        WHERE id= ${ id }
+        WHERE id = ${ id }
         RETURNING *;
         `, [ count, duration ]);
 
-    //    console.log ("LLLLLLLLLLLLLL", updatedRoutineActivity)
+       console.log (">>>>>>",updatedRoutineActivity[0])
     
    return updatedRoutineActivity[0]
 
@@ -91,12 +94,11 @@ async function destroyRoutineActivity(id) {
   try{
   const { rows: deletedRoutineActivity } = await client.query(`
   DELETE FROM routine_activities
-  WHERE "activityId" = $1
+  WHERE routine_activities.id = $1
   RETURNING *;
-
   `, [id])
 
-  console.log ("LLLLLLLLLLLLLL", deletedRoutineActivity)
+  console.log (deletedRoutineActivity)
 return deletedRoutineActivity[0]
 
 } catch (error) {

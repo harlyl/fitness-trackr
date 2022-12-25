@@ -88,7 +88,7 @@ async function attachActivitiesToRoutines(routines) {
 
 
 async function createActivity({name, description}) {
-//console.log ("input to %%%%%%%%%%%%%%%%%%creatActivityyyyyyyyyy", name, description)
+//console.log (name, description)
 
   try {
     const { rows } = await client.query(`
@@ -99,7 +99,7 @@ async function createActivity({name, description}) {
     `, [name, description]);
 
    
- // console.log ("createdActivity%%%%%%%%%%%%%%%%%%,,,,,,,,,,,,,", rows[0]);
+ //console.log (rows[0])
 
    return rows[0];
 
@@ -111,23 +111,14 @@ async function createActivity({name, description}) {
 
 }
 
-// don't try to update the id
-// do update the name and description
-// return the updated activity
+
 
 async function updateActivity(fields) {
-
+console.log (fields)
   const {id, name, description} = fields
- // console.log("###############################fields", id, name, description)
+ console.log(id, name, description)
 
- // const setString = Object.keys(fields).map(
- //   (key, index) => `"${ key }"=$${ index +1 }`
-//).join(', ');
-
-//if (setString.length === 0) {
- //   return;
-//}
-//console.log("###############################setString, id", name, description, id)
+ 
 
 try {
   if (name){
@@ -138,7 +129,7 @@ try {
     RETURNING *;
     `, [name]);
 
-  //  console.log("###############################ACTIvityROWS name", namechange[0])
+  console.log(nameChange[0])
     return nameChange[0];
 
 }   if (description){
@@ -149,14 +140,14 @@ try {
   RETURNING *;
   `, [description]);
 
-  //console.log("###############################ACTIvityROWS description", descriptionchange[0])
+  
   return descriptionChange[0];
 
 }
 
 } catch (error) {
-   // console.log ("Error in updateActivity function")
-   // throw error;
+   console.log ("Error in updateActivity function")
+   throw error;
 }
 }
 
