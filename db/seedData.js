@@ -1,5 +1,13 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
 
+const { getAllActivities } = require('./activities');
+const { createUser } = require('./users');
+const { createActivity } = require('./activities');
+const { createRoutine, getRoutinesWithoutActivities } = require('./routines');
+const { addActivityToRoutine } = require('./routine_activities');
+const client = require("./client");
+
+
 // const { } = require('./');
 const client = require("./client");
 const {createUser} = require("./users");
@@ -8,62 +16,74 @@ const {createRoutine} = require("./routines");
 const {getRoutinesWithoutActivities} = require("./routines");
 const {addActivityToRoutine} = require("./routine_activities");
 async function dropTables() {
-  console.log("Dropping All Tables...")
+  
   // drop all tables, in the correct order
-  try {await client.query(`
-  DROP TABLE IF EXISTS "routineActivities" CASCADE;
-  DROP TABLE IF EXISTS routines CASCADE;
-  DROP TABLE IF EXISTS activities CASCADE;
-  DROP TABLE IF EXISTS users CASCADE;
-  `);}
-  catch (error){
-    console.error(error);
-    throw error
-  }
 
-}
+  try {
+    console.log ("Starting to drop tables...");
+
+    await client.query(`
+    DROP TABLE IF EXISTS routine_activities CASCADE;
+    DROP TABLE IF EXISTS routines CASCADE;
+    DROP TABLE IF EXISTS activities CASCADE;
+    DROP TABLE IF EXISTS users;
+`);
+
+    console.log ("Finished dropping tables!")
+} catch (error){
+    console.log("Error dropping tables!")
+    throw error;
+};
+};
+
+
 
 
 
 async function createTables() {
-  console.log("Starting to build tables...")
+  
   // create all tables, in the correct order
 
-  try {await client.query(`
-  CREATE TABLE users(
-    id SERIAL PRIMARY KEY,
-    username varchar(255) UNIQUE NOT NULL,
-    password varchar(255) NOT NULL
+  try{
+    console.log("Starting to build tables...")
+
+    await client.query(`
+      CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username varchar(255) UNIQUE NOT NULL,
+      password varchar(255) NOT NULL
     );
+      CREATE TABLE activities (
+      id SERIAL PRIMARY KEY,
+      name varchar(255) UNIQUE NOT NULL,
+      description TEXT NOT NULL
+    );
+      CREATE TABLE routines (
+      id SERIAL PRIMARY KEY,
+      "creatorId" INTEGER REFERENCES users(id),
+      name varchar(255) UNIQUE NOT NULL,
+      goal TEXT NOT NULL,
+      "isPublic" BOOLEAN DEFAULT true
+    );
+      CREATE TABLE routine_activities (
+      id SERIAL PRIMARY KEY,
+      "routineId" INTEGER REFERENCES routines(id),
+      "activityId" INTEGER REFERENCES activities(id),
+      UNIQUE("routineId", "activityId"),
+      count INTEGER NOT NULL,
+      duration INTEGER NOT NULL
+    );
+`)
 
-  CREATE TABLE activities(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT NOT NULL
-  );
-
-  CREATE TABLE routines(
-    id SERIAL PRIMARY KEY,
-    "creatorId" INTEGER REFERENCES users(id),
-    "isPublic" BOOLEAN DEFAULT false,
-    name varchar(255) UNIQUE NOT NULL,
-    goal TEXT NOT NULL
-  );
-
-  CREATE TABLE "routineActivities"(
-    id SERIAL PRIMARY KEY,
-    "routineId" INTEGER REFERENCES routines(id),
-    "activityId" INTEGER REFERENCES activities(id),
-    duration INTEGER,
-    count INTEGER
-  );
-  `);} catch (error) {
-    console.log("error creating tables")
-    console.error(error);
-    throw error
-  }
-  
+console.log("Finished building tables!");
+} catch (error){
+    console.log("Error building Tables!");
+    throw error;
 }
+
+}
+
+
 
 /* 
 

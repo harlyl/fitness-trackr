@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const  {JWT_SECRET}= process.env;
+
 const {requireUser} = require('./utils');
 const { getAllActivities, createActivity, updateActivity, 
         getActivityById, getActivityByName } = require ('../db/activities');
@@ -9,31 +8,40 @@ const { getPublicRoutinesByActivity } = require('../db/routines');
 
 // GET /api/activities/:activityId/routines
 router.get('/:activityId/routines', async (req,res,next) => {
-    
+
+    try{
     const { activityId } = req.params;
+    
+    const activity = await getActivityById(activityId)
+   
+    if (!activity){
+      
+      res.send({
+        error: "Error",
+        name: 'ActivityDoesNotExistsError',
+        message: `Activity ${activityId} not found`
+    })
+  }
+    
+    const routines = await getPublicRoutinesByActivity(activity);
+      
+    console.log (routines)
 
-    const _activity = await getActivityById(activityId);
-      // console.log ("VV******************* getActivityById", _activity, activityId)
-
-        if (!_activity) {
+        if (routines.length === 0) {
             res.send({
                 error: "Error",
-                name: 'ActivityDoesNotExistsError',
-                message: `Activity ${activityId} not found`
+                name: 'No Routines Error',
+                message: `No Routines with ${activityId} not found`
             }); 
+        } else{
+          console.log (routines)
+            res.send(routines)
           }
 
-  //  console.log ("################req.params activityId", activityId)
-  
-    try{
-        const publicroutines= await getPublicRoutinesByActivity(activityId);
-
-      console.log ("###########################ACTIVITY", publicroutines)
-   
-      if (_activity && publicroutines) {
-        res.send(publicroutines); 
-      }
+ 
     } catch ({ name, message})  {
+     
+
         next({ name, message });
     }   
 });
@@ -42,7 +50,9 @@ router.get('/:activityId/routines', async (req,res,next) => {
 
 // GET /api/activities
 router.get('/', async (req,res,next) => {
-   // console.log ("GETALLACTIVITIES REQ.BODY",req.body)
+
+   
+
     try{
         const allActivities = await getAllActivities();
        
@@ -54,63 +64,58 @@ router.get('/', async (req,res,next) => {
 });
 
 // POST /api/activities
-router.post('/', async (req, res, next) => {
- const { name, description } = req.body;
-console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%router.post req.body name, description", name, description)
- const prefix = 'Bearer ';
- const auth = req.header('Authorization');
 
- if (!auth) { 
-   next();
- } else if (auth.startsWith(prefix)) {
-   const token = auth.slice(prefix.length)
+router.post('/', requireUser, async (req, res, next) => {
+ const { name, description } = req.body;
+
  
 try{
-
-  const _activity = await getActivityByName(name);
-console.log ("******************* getActivityByName", _activity)
-        
-          if (_activity) {
+  const existingActivity = await getActivityByName(name)
+  if (existingActivity){
+    res.status(403)
             res.send({
                 error: "Error",
-                name: 'ActivityExistsError',
-                message: `An activity with name ${_activity.name} already exists`
+                name: 'ErrorCreatingActivity',
+                message: `An activity with name ${name} already exists`
             }); 
-          } 
 
-const {id} = jwt.verify(token, JWT_SECRET);
-if (id) {
-    const activity = await createActivity(name, description);
-    console.log ("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%activity", activity)
-   
-    res.send(activity);
-}
+  }
+
+  const activity = await createActivity({name, description});
+  
+  
+        
+  res.send(activity);
 
  }catch ({name, message}) 
  {next({name, message});}
- }
- else {
-  next({
-    name: 'AuthorizationHeaderError',
-    message: `Authorization token must start with ${ prefix }`
-  });
-}
-});
+ 
+ });
 
 
 // PATCH /api/activities/:activityId
 
-router.patch('/:activityId', async (req, res, next) => {
+
+router.patch('/:activityId', requireUser,  async (req, res, next) => {
     const { activityId } = req.params;
 
-    //    console.log ("activityId ################################", activityId)
+   
 
     const { name, description } = req.body;
 
-//console.log ("name, description ################################", name, description, req.body)
+
+    const existingActivity = await getActivityByName(name)
+
+    if (existingActivity) {
+      res.send({
+          error: 'Error',
+          name: "ActivityExistsError",
+          message: `An activity with name ${name} already exists`
+      }); 
+    }
 
     const _activity = await getActivityById(activityId);
-       // console.log ("******************* getActivityById", _activity, name)
+       
 
         if (!_activity) {
             res.send({
@@ -118,13 +123,9 @@ router.patch('/:activityId', async (req, res, next) => {
                 name: 'ActivityDoesNotExistsError',
                 message: `Activity ${activityId} not found`
             }); 
-          } else if (_activity) {
-            res.send({
-                error: 'Error',
-                name: "ActivityExistsError",
-                message: `An activity with name ${name} already exists`
-            }); 
-          }
+
+          } 
+
 
     const updateFields = {};
   
@@ -138,12 +139,14 @@ router.patch('/:activityId', async (req, res, next) => {
     }
   updateFields.id = activityId
     try {
-     // console.log ("updateFields ################################", updateFields, activityId)
+
+    
       const updatedActivity = await updateActivity(updateFields);
-    //  console.log ("updatedActivity ################################", updatedActivity)
+      
+   
 
+        res.send(updatedActivity )
 
-        res.send({ activity: updatedActivity })
       
       } catch ({ name, message }) {
       next({ name, message });
@@ -152,9 +155,7 @@ router.patch('/:activityId', async (req, res, next) => {
 
 
 
-module.exports = router;
-<<<<<<< HEAD
 
-=======
-console.log();
->>>>>>> routines
+
+
+module.exports = router;

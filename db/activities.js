@@ -1,7 +1,7 @@
 const client = require("./client")
 
 // database functions
-<<<<<<< HEAD
+
 
 async function getAllActivities() {   
   try {
@@ -16,20 +16,7 @@ async function getAllActivities() {
     }
   }
 
-=======
-async function getAllActivities() {
-  try {let {rows} = await client.query(`
-  SELECT *
-  FROM activities;
-  `);
-  return rows
-} catch (error){
-    console.log("error in getAllActivities");
-    console.error(error);
-    throw Error
-  }
-}
->>>>>>> andrewBranch
+
 
 async function getActivityById(id) {
 
@@ -68,14 +55,43 @@ async function getActivityByName(name) {
 // select and return an array of all activities
 async function attachActivitiesToRoutines(routines) {
   
+
+  const routineArray = [...routines];
+ // console.log(routineArray)
+  const routineIds = routines.map((routine) => {return routine.id});
+  //console.log (routineIds)
+  if (routines.length === 0){
+    return;
+  }
+  
+  try{
+    const {rows: activities} = await client.query(`
+    SELECT activities.*, routine_activities.duration, routine_activities.count, 
+    routine_activities.id AS "routineActivityId", routine_activities."routineId"
+    FROM activities
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
+    WHERE routine_activities."routineId" IN (${routineIds.map((routineId, index) => 
+      ('$' + (index +1))).join(',')});
+    `, routineIds);
+
+    for (let routine of routineArray){
+      const addActivities = activities.filter((activity) => routine.id === activity.routineId);
+      routine.activities = addActivities;
+      } 
+
+   // console.log (routineArray)
+    return await routineArray;
+  } catch (error) {
+    console.log("Error attaching activities to routines")
+    throw error;
+  }
 }
 
 // return the new activity
-<<<<<<< HEAD
 
 
 async function createActivity({name, description}) {
-//console.log ("input to %%%%%%%%%%%%%%%%%%creatActivityyyyyyyyyy", name, description)
+//console.log (name, description)
 
   try {
     const { rows } = await client.query(`
@@ -86,7 +102,7 @@ async function createActivity({name, description}) {
     `, [name, description]);
 
    
- // console.log ("createdActivity%%%%%%%%%%%%%%%%%%,,,,,,,,,,,,,", rows[0]);
+ //console.log (rows[0])
 
    return rows[0];
 
@@ -95,28 +111,7 @@ async function createActivity({name, description}) {
     throw error;
 }
 
-=======
-async function createActivity({ name, description }) {
-  try {
-    const {rows: [activity]} = await client.query(`
-    INSERT INTO activities(name, description)
-    VALUES ($1, $2)
-    ON CONFLICT (name) DO NOTHING
-    RETURNING *;
-    `, [name,description]);
-    return activity
-  } catch (error) {
-    console.log("error in createActivity");
-    console.error(error);
-    throw Error
-  }
->>>>>>> andrewBranch
 
-}
-
-// don't try to update the id
-// do update the name and description
-// return the updated activity
 
 async function updateActivity(fields) {
 
@@ -160,6 +155,46 @@ try {
 } catch (error) {
    // console.log ("Error in updateActivity function")
    // throw error;
+}
+}
+
+
+
+async function updateActivity(fields) {
+console.log (fields)
+  const {id, name, description} = fields
+ console.log(id, name, description)
+
+ 
+
+try {
+  if (name){
+    const {rows: nameChange}  = await client.query(`
+    UPDATE activities
+    SET name=$1
+    WHERE id= ${id}
+    RETURNING *;
+    `, [name]);
+
+  console.log(nameChange[0])
+    return nameChange[0];
+
+}   if (description){
+  const {rows: descriptionChange}  = await client.query(`
+  UPDATE activities
+  SET description=$1
+  WHERE id= ${id}
+  RETURNING *;
+  `, [description]);
+
+  
+  return descriptionChange[0];
+
+}
+
+} catch (error) {
+   console.log ("Error in updateActivity function")
+   throw error;
 }
 }
 

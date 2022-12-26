@@ -10,9 +10,10 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --runInBand --watchAll",
-    "test:watch:db": "jest --watchAll db",
-    "test:watch:api": "jest --watchAll api",
-    "users:dev": "nodemon ./db/users.js"
+
+    "test:watch:api": "jest --runInBand --watchAll api",
+    "test:watch:db": "jest --runInBand --watchAll db"
+
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
-    "chalk": "^4.0.0",
+    "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
