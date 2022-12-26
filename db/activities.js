@@ -2,6 +2,7 @@ const client = require("./client")
 
 // database functions
 
+
 async function getAllActivities() {   
   try {
       const { rows } = await client.query(`
@@ -14,6 +15,7 @@ async function getAllActivities() {
       throw error;
     }
   }
+
 
 
 async function getActivityById(id) {
@@ -53,6 +55,7 @@ async function getActivityByName(name) {
 // select and return an array of all activities
 async function attachActivitiesToRoutines(routines) {
   
+
   const routineArray = [...routines];
  // console.log(routineArray)
   const routineIds = routines.map((routine) => {return routine.id});
@@ -109,6 +112,50 @@ async function createActivity({name, description}) {
 }
 
 
+
+async function updateActivity(fields) {
+
+  const {id, name, description} = fields
+ // console.log("###############################fields", id, name, description)
+
+ // const setString = Object.keys(fields).map(
+ //   (key, index) => `"${ key }"=$${ index +1 }`
+//).join(', ');
+
+//if (setString.length === 0) {
+ //   return;
+//}
+//console.log("###############################setString, id", name, description, id)
+
+try {
+  if (name){
+    const {rows: nameChange}  = await client.query(`
+    UPDATE activities
+    SET name=$1
+    WHERE id= ${id}
+    RETURNING *;
+    `, [name]);
+
+  //  console.log("###############################ACTIvityROWS name", namechange[0])
+    return nameChange[0];
+
+}   if (description){
+  const {rows: descriptionChange}  = await client.query(`
+  UPDATE activities
+  SET description=$1
+  WHERE id= ${id}
+  RETURNING *;
+  `, [description]);
+
+  //console.log("###############################ACTIvityROWS description", descriptionchange[0])
+  return descriptionChange[0];
+
+}
+
+} catch (error) {
+   // console.log ("Error in updateActivity function")
+   // throw error;
+}
 }
 
 

@@ -10,8 +10,10 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --runInBand --watchAll",
+
     "test:watch:api": "jest --runInBand --watchAll api",
     "test:watch:db": "jest --runInBand --watchAll db"
+
   },
   "repository": {
     "type": "git",
@@ -33,7 +35,7 @@
   "devDependencies": {
     "eslint": "^8.2.0",
     "eslint-plugin-jest": "^25.2.4",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.20",
     "supertest": "^6.1.6"
   },
   "dependencies": {
@@ -47,6 +49,7 @@
     "jest": "^26.0.1",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
+    "node": "^19.2.0",
     "pg": "^8.2.1"
   }
 }

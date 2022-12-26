@@ -1,4 +1,5 @@
-const client = require('./client')
+/* eslint-disable no-useless-catch */
+
 
 async function getRoutineActivityById(id){
 
@@ -16,6 +17,7 @@ async function getRoutineActivityById(id){
     throw error;
   }
   
+
 }
 
 async function addActivityToRoutine({
@@ -24,6 +26,7 @@ async function addActivityToRoutine({
   count,
   duration,
 }) {
+
 //console.log ("INPUTS to addActivityToROUTINE", routineId, activityId, count, duration)
   try {
     const { rows: routine_activity } = await client.query(`
@@ -53,9 +56,11 @@ async function getRoutineActivitiesByRoutine(routine) {
    return routineActivity
   } catch (error) {
     console.log ("Error in getRoutineActivitiesByRoutine function")
+
     throw error;
   }
 }
+
 
 async function updateRoutineActivity ({...fields}) {
 console.log(fields)
@@ -84,12 +89,14 @@ const setString = Object.keys(fields).map(
         console.log ("Error in updateRoutineActivity function")
         throw error;
     }
+
 }
 
 
 
 
 async function destroyRoutineActivity(id) {
+
 
   try{
   const { rows: deletedRoutineActivity } = await client.query(`
@@ -131,6 +138,7 @@ if (users[0]){
 }catch (error) {
   console.log ("Error in deleteRoutine function")
   throw error;
+
 }
 }
   

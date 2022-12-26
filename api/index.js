@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+
 const { getUserById } = require('../db/users');
 const { JWT_SECRET } = process.env;
+
 
 // GET /api/health
 router.get('/health', async (req, res, next) => {
     res.status(200);
   res.send({
     message: "system is healthy"
+
 });
 next()
 });
@@ -48,6 +51,7 @@ router.use(async (req, res, next) => {
 //      message: "Page Not Found"
 //     });
 //   });
+
 
 // ROUTER: /api/users
 const usersRouter = require('./users');

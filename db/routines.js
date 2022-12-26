@@ -6,6 +6,7 @@ const { attachActivitiesToRoutines } = require('./activities')
 
 async function getRoutineById(id){
   try {
+
     const { rows: [routine] } = await client.query(`
     SELECT * FROM routines
     WHERE id = $1;
@@ -16,10 +17,12 @@ async function getRoutineById(id){
   } catch (error) {
     console.log ("Error in getRoutineById")
     throw error;
+
   }
 }
 
 async function getRoutinesWithoutActivities(){
+
   try{
     const { rows } = await client.query(`
     SELECT * 
@@ -49,6 +52,7 @@ return await attachActivitiesToRoutines(routines);
     } catch (error) {
     console.log ("Error in getAllRoutines")
     throw error;
+
   }
 }
 
@@ -142,6 +146,7 @@ async function getPublicRoutinesByActivity(activity) {
   }
 }
 
+
 async function createRoutine({creatorId, name, goal, isPublic}) {
 //console.log(creatorId )
   try {
@@ -157,6 +162,7 @@ async function createRoutine({creatorId, name, goal, isPublic}) {
    // console.log ("Error in createRoutine function")
     
   }
+
 }
 
 async function updateRoutine(fields) {

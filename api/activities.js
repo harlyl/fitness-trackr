@@ -1,5 +1,6 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
+
 const {requireUser} = require('./utils');
 const { getAllActivities, createActivity, updateActivity, 
         getActivityById, getActivityByName } = require ('../db/activities');
@@ -7,6 +8,7 @@ const { getPublicRoutinesByActivity } = require('../db/routines');
 
 // GET /api/activities/:activityId/routines
 router.get('/:activityId/routines', async (req,res,next) => {
+
     try{
     const { activityId } = req.params;
     
@@ -39,6 +41,7 @@ router.get('/:activityId/routines', async (req,res,next) => {
  
     } catch ({ name, message})  {
      
+
         next({ name, message });
     }   
 });
@@ -47,7 +50,9 @@ router.get('/:activityId/routines', async (req,res,next) => {
 
 // GET /api/activities
 router.get('/', async (req,res,next) => {
+
    
+
     try{
         const allActivities = await getAllActivities();
        
@@ -59,6 +64,7 @@ router.get('/', async (req,res,next) => {
 });
 
 // POST /api/activities
+
 router.post('/', requireUser, async (req, res, next) => {
  const { name, description } = req.body;
 
@@ -89,6 +95,7 @@ try{
 
 // PATCH /api/activities/:activityId
 
+
 router.patch('/:activityId', requireUser,  async (req, res, next) => {
     const { activityId } = req.params;
 
@@ -109,13 +116,16 @@ router.patch('/:activityId', requireUser,  async (req, res, next) => {
 
     const _activity = await getActivityById(activityId);
        
+
         if (!_activity) {
             res.send({
                 error: "Error",
                 name: 'ActivityDoesNotExistsError',
                 message: `Activity ${activityId} not found`
             }); 
+
           } 
+
 
     const updateFields = {};
   
@@ -129,17 +139,21 @@ router.patch('/:activityId', requireUser,  async (req, res, next) => {
     }
   updateFields.id = activityId
     try {
+
     
       const updatedActivity = await updateActivity(updateFields);
       
    
 
         res.send(updatedActivity )
+
       
       } catch ({ name, message }) {
       next({ name, message });
     }
 });
+
+
 
 
 
