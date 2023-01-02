@@ -35,7 +35,7 @@ async function addActivityToRoutine({
     RETURNING *;
     `, [routineId, activityId, count, duration]);
     
- //   console.log ("OUTPut to addActivityToROUTINE", routine_activity)
+  // console.log ("OUTPut to DB addActivityToROUTINE", routine_activity)
     return routine_activity[0]
 }catch (error) {
     console.log ("Error in addActivityToRoutine function" + error)
@@ -63,7 +63,7 @@ async function getRoutineActivitiesByRoutine(routine) {
 
 
 async function updateRoutineActivity ({...fields}) {
-console.log(fields)
+console.log("DBfields", fields)
     const {count, duration, id}= fields
    // delete fields.routineActivityId
     delete fields.id
