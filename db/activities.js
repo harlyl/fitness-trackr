@@ -115,7 +115,7 @@ async function createActivity({name, description}) {
 
 
 // async function updateActivity(fields) {
-
+// test
 //   const {id, name, description} = fields
 //  // console.log("###############################fields", id, name, description)
 
