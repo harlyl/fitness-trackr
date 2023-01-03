@@ -8,13 +8,7 @@ const { addActivityToRoutine } = require('./routine_activities');
 const client = require("./client");
 
 
-// const { } = require('./');
-// const client = require("./client");
-// const {createUser} = require("./users");
-// const {createActivity, getAllActivities} = require("./activities");
-// const {createRoutine} = require("./routines");
-// const {getRoutinesWithoutActivities} = require("./routines");
-// const {addActivityToRoutine} = require("./routine_activities");
+
 async function dropTables() {
   
   // drop all tables, in the correct order

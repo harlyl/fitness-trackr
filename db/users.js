@@ -107,41 +107,11 @@ async function getUserByUsername(username) {
 
 
 
-// async function getUserById(userId) {
-//   try {
-//     const { rows: [ user ] } = await client.query(`
-//     SELECT id, username
-//     FROM users
-//     WHERE id=$1;
-//     `, [userId]);
-//     console.log(user);
-//     return user;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// }
 
 
 
 
-// async function getUserByUsername(username) {
-//   try {
-//     const {rows: [user]} = await client.query(`
-//     SELECT *
-//     FROM users
-//     WHERE username=$1;
-//     `, [username]);
 
-//     console.log("getUserBYUSERNAME", user);
-
-//     return user;
-//   } catch (error) {
-//     console.log('there was an error in getUserByUsername');
-//     console.error(error);
-//     throw error;
-//   }
-// }
 
 
 module.exports = {

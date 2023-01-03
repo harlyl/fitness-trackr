@@ -44,13 +44,7 @@ router.use(async (req, res, next) => {
   });
 
 
-// router.use((error, req, res, next) => {
-//   console.log ("EEEERRRRROOORRR", error);
-//    res.status(404);
-//   res.send({
-//      message: "Page Not Found"
-//     });
-//   });
+
 
 
 // ROUTER: /api/users
